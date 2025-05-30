@@ -13,9 +13,9 @@
 
         <div class="floating-window">
             <h2>Shorten Your URL</h2>
-            <form>
+            <form id="urlForm">
                 <div class="input-group">
-                    <input type="text" placeholder="Enter URL" required>
+                    <input type="text" id="urlInput" placeholder="Enter URL" required>
                 </div>
                 <div class="input-group" hidden>
                     <input type="text" placeholder="Custom Alias (optional)">
@@ -25,6 +25,8 @@
                 </div>
                 <button type="submit">Shorten</button>
             </form>
+            <br>
+            <a id="shortUrlOutput"></a>
         </div>
 
         <script src="/script.js"></script>

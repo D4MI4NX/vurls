@@ -65,14 +65,14 @@ pub fn (app &App) index(mut ctx Context) veb.Result {
 
 pub fn (app &App) style(mut ctx Context) veb.Result {
 	ctx.set_content_type("text/css")
-	css := $tmpl("templates/style.css")
-	return ctx.text(css)
+	css := $embed_file("templates/style.css", .zlib)
+	return ctx.text(css.to_string())
 }
 
 pub fn (app &App) script(mut ctx Context) veb.Result {
 	ctx.set_content_type("text/javascript")
-	js := $tmpl("templates/script.js")
-	return ctx.text(js)
+	js := $embed_file("templates/script.js", .zlib)
+	return ctx.text(js.to_string())
 }
 
 @[post]
