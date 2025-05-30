@@ -17,7 +17,7 @@
                 <div class="input-group">
                     <input type="text" placeholder="Enter URL" required>
                 </div>
-                <div class="input-group">
+                <div class="input-group" hidden>
                     <input type="text" placeholder="Custom Alias (optional)">
                 </div>
                 <div class="input-group" @{hidden_value}>
@@ -26,5 +26,7 @@
                 <button type="submit">Shorten</button>
             </form>
         </div>
+
+        <script src="/script.js"></script>
     </body>
 </html>

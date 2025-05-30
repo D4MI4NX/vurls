@@ -26,6 +26,7 @@ pub fn (app &App) root(mut ctx Context, _path string) veb.Result {
 	match path {
 		"index.html", "" { return app.index(mut ctx) }
 		"style.css" { return app.style(mut ctx) }
+		"script.js" { return app.script(mut ctx) }
 		else {}
 	}
 
@@ -57,7 +58,7 @@ pub fn (app &App) root(mut ctx Context, _path string) veb.Result {
 }
 
 pub fn (app &App) index(mut ctx Context) veb.Result {
-    hidden_value := if app.password != "" {""} else {'hidden="hidden"'}
+    hidden_value := if app.password != "" {""} else {"hidden"}
 	idx := $tmpl("templates/index.html")
 	return ctx.html(idx)
 }
@@ -66,6 +67,12 @@ pub fn (app &App) style(mut ctx Context) veb.Result {
 	ctx.set_content_type("text/css")
 	css := $tmpl("templates/style.css")
 	return ctx.text(css)
+}
+
+pub fn (app &App) script(mut ctx Context) veb.Result {
+	ctx.set_content_type("text/javascript")
+	js := $tmpl("templates/script.js")
+	return ctx.text(js)
 }
 
 @[post]
