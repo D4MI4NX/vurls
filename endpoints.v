@@ -43,7 +43,7 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 }
 
 pub fn (app &App) index(mut ctx Context) veb.Result {
-    hidden_value := if app.password != "" {""} else {"hidden"}
+    hidden_value := if app.config.password != "" {""} else {"hidden"}
 	idx := $tmpl("templates/index.html")
 	return ctx.html(idx)
 }
@@ -74,7 +74,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 
 	password := ctx.form["password"]
 
-	if password != app.password {
+	if password != app.config.password {
 		return ctx.request_error("Wrong Password!")
 	}
 
@@ -100,7 +100,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 		s.url = url
 		s.ip_address = ip
 		s.created = now
-		s.expires = now + app.expiration_time
+		s.expires = now + app.config.expiration_time
 
 		id = sql app.db {
 			insert s into ShortUrl
@@ -109,7 +109,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 			return ctx.server_error("Unknown server failure!")
 		}
 
-		app.shortening_timeout_tracker[ip] = now + app.shortening_timeout
+		app.shortening_timeout_tracker[ip] = now + app.config.shortening_timeout
 	}
 
 	path := base58.encode_int(int(id)) or { panic(err) }
