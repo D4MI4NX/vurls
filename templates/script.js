@@ -2,9 +2,11 @@ document.getElementById("urlForm").addEventListener("submit", async function(eve
     event.preventDefault();
 
     const url = document.getElementById("urlInput").value;
+    const password = document.getElementById("passwordInput").value;
 
     const formData = new URLSearchParams();
     formData.append("url", url);
+    formData.append("password", password);
 
     const response = await fetch("/shorten", {
         method: "POST",
