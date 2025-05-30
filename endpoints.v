@@ -18,6 +18,7 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 	if ctx.req.method == .post {
 		match path {
 			"shorten" { return app.shorten(mut ctx) }
+			"dump_db" { return app.dump_db(mut ctx) }
 			else {}
 		}
 	}
@@ -115,4 +116,21 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 	path := base58.encode_int(int(id)) or { panic(err) }
 
 	return ctx.ok(path)
+}
+
+@[post]
+pub fn (app &App) dump_db(mut ctx Context) veb.Result {
+	password := ctx.form["password"]
+
+	if app.config.admin_password == "" || app.config.admin_password != password {
+		return ctx.request_error("Permission denied!")
+	}
+
+	db_dump := app.db.dump() or {
+		println("dump_db: ${err}")
+		return ctx.server_error(err.str())
+	}
+
+	ctx.set_content_type("application/json")
+	return ctx.text(db_dump)
 }
