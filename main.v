@@ -17,10 +17,12 @@ mut:
 	port u16 = 8080
     password string // optional password to create a short URL
 	expiration_time i64 = 60*60*24 // 24 hours
+	shortening_timeout i64 = 60*5 // 5 Minutes
+	shortening_timeout_tracker map[string]i64 = {}
 }
 
 @["/:path..."]
-pub fn (app &App) root(mut ctx Context, _path string) veb.Result {
+pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 	path := _path.trim_left("/")
 
 	match path {
@@ -76,7 +78,17 @@ pub fn (app &App) script(mut ctx Context) veb.Result {
 }
 
 @[post]
-pub fn (app &App) shorten(mut ctx Context) veb.Result {
+pub fn (mut app App) shorten(mut ctx Context) veb.Result {
+	ip := ctx.ip()
+	now := time.now().unix()
+
+	timeout := app.shortening_timeout_tracker[ip] - now
+	if 0 < timeout {
+		return ctx.request_error("Shortening timeout. ${timeout}s remaining")
+	} else {
+		app.shortening_timeout_tracker.delete(ip)
+	}
+
 	password := ctx.form["password"]
 
 	if password != app.password {
@@ -103,8 +115,7 @@ pub fn (app &App) shorten(mut ctx Context) veb.Result {
 	} else {
 		mut s := ShortUrl{}
 		s.url = url
-		s.ip_address = ctx.ip()
-		now := time.now().unix()
+		s.ip_address = ip
 		s.created = now
 		s.expires = now + app.expiration_time
 
@@ -114,6 +125,8 @@ pub fn (app &App) shorten(mut ctx Context) veb.Result {
 			println("shorten: failed to insert into DB: ${err}")
 			return ctx.server_error("Unknown server failure!")
 		}
+
+		app.shortening_timeout_tracker[ip] = now + app.shortening_timeout
 	}
 
 	path := base58.encode_int(int(id)) or { panic(err) }
