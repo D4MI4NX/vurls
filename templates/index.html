@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>V URL Shortener</title>
+        <link rel="stylesheet" href="/style.css">
+    </head>
+
+    <body>
+
+        <div class="top-bar">V URL shortener</div>
+
+        <div class="floating-window">
+            <h2>Shorten Your URL</h2>
+            <form>
+                <div class="input-group">
+                    <input type="text" placeholder="Enter URL" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" placeholder="Custom Alias (optional)">
+                </div>
+                <div class="input-group" @{hidden_value}>
+                    <input type="password" placeholder="Password">
+                </div>
+                <button type="submit">Shorten</button>
+            </form>
+        </div>
+    </body>
+</html>

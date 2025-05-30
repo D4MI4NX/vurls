@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start; /* Changed to flex-start */
+    height: 100vh;
+}
+
+.top-bar {
+    width: 100%;
+    background-color: #3b7bbf;
+    color: white;
+    text-align: center;
+    padding: 15px 0;
+    font-size: 24px;
+    position: fixed; /* Added fixed positioning */
+    top: 0; /* Aligns the top bar to the top */
+    left: 0; /* Aligns the top bar to the left */
+    z-index: 1000; /* Ensures the top bar is above other elements */
+}
+
+.floating-window {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 300px;
+    text-align: center;
+    margin-top: 80px; /* Added margin to avoid overlap with the top bar */
+}
+
+.floating-window h2 {
+    color: #3b7bbf;
+    margin-bottom: 20px;
+}
+
+.input-group {
+    margin-bottom: 15px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #4a607e;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #3b7bbf;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+}
+
+button:hover {
+    background-color: #4a607e;
+}
