@@ -15,6 +15,11 @@ mut:
 	expiration_time i64 = 60*60*24 // 24 hours
 }
 
+@["/"]
+pub fn (app &App) root(mut ctx Context) veb.Result {
+	return app.index(mut ctx)
+}
+
 @["/index.html"]
 pub fn (app &App) index(mut ctx Context) veb.Result {
     hidden_value := if app.password != "" {""} else {'hidden="hidden"'}
