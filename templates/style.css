@@ -6,7 +6,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Changed to flex-start */
+    justify-content: flex-start;
     height: 100vh;
 }
 
@@ -17,20 +17,21 @@ body {
     text-align: center;
     padding: 15px 0;
     font-size: 24px;
-    position: fixed; /* Added fixed positioning */
-    top: 0; /* Aligns the top bar to the top */
-    left: 0; /* Aligns the top bar to the left */
-    z-index: 1000; /* Ensures the top bar is above other elements */
+    font-weight: bold;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
 }
 
 .floating-window {
-    background-color: white;
+    background-color: #c2c2c2;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 20px;
     width: 300px;
     text-align: center;
-    margin-top: 80px; /* Added margin to avoid overlap with the top bar */
+    margin-top: 192px;
 }
 
 .floating-window h2 {
@@ -40,6 +41,10 @@ body {
 
 .input-group {
     margin-bottom: 15px;
+}
+
+.input-group:not([hidden]) {
+    display: flex;
 }
 
 input {
@@ -68,4 +73,14 @@ button:hover {
 #shortUrlOutput {
     font-weight: bolder;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+    }
+
+    .floating-window {
+        background-color: #3f3f3f;
+    }
 }
