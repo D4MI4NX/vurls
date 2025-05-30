@@ -89,21 +89,34 @@ pub fn (app &App) shorten(mut ctx Context) veb.Result {
 		return ctx.request_error("Invalid URL!")
 	}
 
-	mut s := ShortUrl{}
-	s.url = url
-	s.ip_address = ctx.ip()
-	now := time.now().unix()
-	s.created = now
-	s.expires = now + app.expiration_time
-
-	id := sql app.db {
-		insert s into ShortUrl
+	rows := sql app.db {
+		select from ShortUrl where url == url
 	} or {
-		println("shorten: failed to insert into DB: ${err}")
+		println("shorten: failed query DB: ${err}")
 		return ctx.server_error("Unknown server failure!")
 	}
 
-	path := base58.encode_int(id) or { panic(err) }
+	mut id := i64(0)
+
+	if 0 < rows.len {
+		id = rows.first().id
+	} else {
+		mut s := ShortUrl{}
+		s.url = url
+		s.ip_address = ctx.ip()
+		now := time.now().unix()
+		s.created = now
+		s.expires = now + app.expiration_time
+
+		id = sql app.db {
+			insert s into ShortUrl
+		} or {
+			println("shorten: failed to insert into DB: ${err}")
+			return ctx.server_error("Unknown server failure!")
+		}
+	}
+
+	path := base58.encode_int(int(id)) or { panic(err) }
 
 	return ctx.ok(path)
 }
