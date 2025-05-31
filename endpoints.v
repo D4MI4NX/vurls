@@ -100,23 +100,49 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 	if 0 < rows.len {
 		id = rows.first().id
 	} else {
+		expired_rows := sql app.db {
+			select from ShortUrl where expires < now
+		} or {
+			log.error("shorten: failed to query DB: ${err}")
+			[]ShortUrl{}
+		}
+
 		mut s := ShortUrl{}
 		s.url = url
 		s.ip_address = ip
 		s.created = now
 		s.expires = now + app.config.expiration_time
 
-		id = sql app.db {
-			insert s into ShortUrl
-		} or {
-			log.error("shorten: failed to insert into DB: ${err}")
-			return ctx.server_error("Unknown server failure!")
+		if 0 < expired_rows.len {
+			row := expired_rows.first()
+			sql app.db {
+				update ShortUrl set
+					expires = s.expires
+					,url = s.url
+					,ip_address = s.ip_address
+					,created = s.created
+				where id == row.id
+			} or {
+				log.error("shorten: failed to update DB: ${err}")
+				return ctx.server_error("Unknown server failure!")
+			}
+			id = row.id
+		} else {
+			id = sql app.db {
+				insert s into ShortUrl
+			} or {
+				log.error("shorten: failed to insert into DB: ${err}")
+				return ctx.server_error("Unknown server failure!")
+			}
 		}
 
 		app.shortening_timeout_tracker[ip] = now + app.config.shortening_timeout
 	}
 
-	path := base58.encode_int(int(id)) or { panic(err) }
+	path := base58.encode_int(int(id)) or {
+		log.error("failed to base58 encode ${id}: ${err}")
+		return ctx.server_error("Unknown server failure!")
+	}
 
 	log.info("[+] ${ip} -> ${url} = ${path}")
 
