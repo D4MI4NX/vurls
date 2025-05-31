@@ -12,13 +12,15 @@ pub struct Context {
 @[version: "0.0.0"]
 @[name: "VURLS"]
 struct AppConfig {
-	port u16 = 8080 @[short: p; xdoc: "Specify port to listen on (default 8080)"]
+	config_file_path string @[short: c; long: config; xdoc: "Load or create config at given path"; skip]
+	ignore_config_file bool @[short: i; long: ignorecfg; xdoc: "Dont load any config files"; skip]
+	port int = 8080 @[short: p; xdoc: "Specify port to listen on (default 8080)"]
 	db_path string = ":memory:" @[short: d; xdoc: "Path to the SQLite3 DB to use (default :memory:)"]
 	password string @[short: P; xdoc: "Optional password to require to shorten an URL"]
 	admin_password string @[short: a; long: admpwd; xdoc: "Optional admin password for administrative purposes (undefined = disabled)"]
 	expiration_time i64 = 60*60*24 @[short: e; xdoc: "Time in seconds the short URL expires after creation (default 24 hours)"]
 	shortening_timeout i64 = 60*5 @[short: t; xdoc: "Time in seconds after an IP-address can shorten another URL (default 5 minutes)"]
-	show_help bool @[short: h; long: help]
+	show_help bool @[short: h; long: help; skip]
 }
 
 struct App {
@@ -29,12 +31,16 @@ mut:
 }
 
 fn main() {
-	cfg, _ := flag.to_struct[AppConfig](os.args) or { panic(err) }
+	mut cfg, _ := flag.to_struct[AppConfig](os.args) or { panic(err) }
 	if cfg.show_help {
         documentation := flag.to_doc[AppConfig]()!
         println(documentation)
         exit(0)
     }
+
+	if !cfg.ignore_config_file {
+		cfg = load_config_file(cfg)
+	}
 
 	mut app := &App{}
 	app.config = cfg
