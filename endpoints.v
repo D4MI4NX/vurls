@@ -73,16 +73,6 @@ pub fn (app &App) favicon(mut ctx Context) veb.Result {
 
 @[post]
 pub fn (mut app App) shorten(mut ctx Context) veb.Result {
-	ip := ctx.ip()
-	now := time.now().unix()
-
-	timeout := app.shortening_timeout_tracker[ip] - now
-	if 0 < timeout {
-		return ctx.request_error("Shortening timeout. ${timeout}s remaining")
-	} else {
-		app.shortening_timeout_tracker.delete(ip)
-	}
-
 	password := ctx.form["password"]
 
 	if password != app.config.password {
@@ -104,9 +94,19 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 
 	mut id := i64(0)
 
+	ip := ctx.ip()
+	now := time.now().unix()
+
 	if 0 < rows.len {
 		id = rows.first().id
 	} else {
+		timeout := app.shortening_timeout_tracker[ip] - now
+		if 0 < timeout {
+			return ctx.request_error("Shortening timeout. ${timeout}s remaining")
+		} else {
+			app.shortening_timeout_tracker.delete(ip)
+		}
+
 		expired_rows := sql app.db {
 			select from ShortUrl where expires < now
 		} or {
