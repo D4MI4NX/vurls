@@ -1,6 +1,7 @@
 module main
 
 import encoding.base58
+import log
 import time
 import veb
 
@@ -30,7 +31,7 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 	result := sql app.db {
 		select from ShortUrl where id == id
 	} or {
-		println("root: failed to get entry from DB: ${err}")
+		log.error("root: failed to get entry from DB: ${err}")
 		return ctx.server_error("Unknown server failure")
 	}
 
@@ -39,6 +40,8 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 	}
 
 	s := result.first()
+
+	log.info("[>] ${ctx.ip()} -> ${s.url}")
 
 	return ctx.redirect(s.url)
 }
@@ -88,7 +91,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 	rows := sql app.db {
 		select from ShortUrl where url == url
 	} or {
-		println("shorten: failed query DB: ${err}")
+		log.error("shorten: failed query DB: ${err}")
 		return ctx.server_error("Unknown server failure!")
 	}
 
@@ -106,7 +109,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 		id = sql app.db {
 			insert s into ShortUrl
 		} or {
-			println("shorten: failed to insert into DB: ${err}")
+			log.error("shorten: failed to insert into DB: ${err}")
 			return ctx.server_error("Unknown server failure!")
 		}
 
@@ -115,19 +118,25 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 
 	path := base58.encode_int(int(id)) or { panic(err) }
 
+	log.info("[+] ${ip} -> ${url} = ${path}")
+
 	return ctx.ok(path)
 }
 
 @[post]
 pub fn (app &App) dump_db(mut ctx Context) veb.Result {
 	password := ctx.form["password"]
+	ip := ctx.ip()
 
 	if app.config.admin_password == "" || app.config.admin_password != password {
+		log.warn("[!] ${ip} tried admin password <${password}>")
 		return ctx.request_error("Permission denied!")
 	}
 
+	log.warn("[?] ${ip} authenticated as admin")
+
 	db_dump := app.db.dump() or {
-		println("dump_db: ${err}")
+		log.error("dump_db: ${err}")
 		return ctx.server_error(err.str())
 	}
 

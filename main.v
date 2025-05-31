@@ -1,6 +1,7 @@
 module main
 
 import flag
+import log
 import os
 import veb
 
@@ -20,6 +21,7 @@ struct AppConfig {
 	admin_password string @[short: a; long: admpwd; xdoc: "Optional admin password for administrative purposes (undefined = disabled)"]
 	expiration_time i64 = 60*60*24 @[short: e; xdoc: "Time in seconds the short URL expires after creation (default 24 hours)"]
 	shortening_timeout i64 = 60*5 @[short: t; xdoc: "Time in seconds after an IP-address can shorten another URL (default 5 minutes)"]
+	verbose bool @[short: v; xdoc: "Log shortenings and redirects"]
 	show_help bool @[short: h; long: help; skip]
 }
 
@@ -41,6 +43,12 @@ fn main() {
 	if !cfg.ignore_config_file {
 		cfg = load_config_file(cfg)
 	}
+
+	mut l := log.Log{}
+	l.set_level(if cfg.verbose {.info} else {.warn})
+	l.set_time_format(.tf_ss)
+	log.set_logger(l)
+	println("Using log level: ${log.get_level()}")
 
 	mut app := &App{}
 	app.config = cfg
