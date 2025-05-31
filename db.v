@@ -5,9 +5,12 @@ import json
 
 type ShortenerDB = sqlite.DB
 
-fn ShortenerDB.new() !ShortenerDB {
-	db := sqlite.connect(":memory:")!
-	db.journal_mode(sqlite.JournalMode.memory)!
+fn ShortenerDB.connect(cfg AppConfig) !ShortenerDB {
+	db := sqlite.connect(cfg.db_path)!
+
+	if cfg.db_path == ":memory:" {
+		db.journal_mode(sqlite.JournalMode.memory)!
+	}
 
 	sql db {
 		create table ShortUrl
