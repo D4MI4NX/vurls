@@ -13,6 +13,7 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 		"index.html", "" { return app.index(mut ctx) }
 		"style.css" { return app.style(mut ctx) }
 		"script.js" { return app.script(mut ctx) }
+		"favicon.ico" { return app.favicon(mut ctx) }
 		else {}
 	}
 
@@ -62,6 +63,12 @@ pub fn (app &App) script(mut ctx Context) veb.Result {
 	ctx.set_content_type("text/javascript")
 	js := $embed_file("templates/script.js", .zlib)
 	return ctx.text(js.to_string())
+}
+
+pub fn (app &App) favicon(mut ctx Context) veb.Result {
+	ctx.set_content_type("image/vnd.microsoft.icon")
+	img := $embed_file("templates/favicon.ico")
+	return ctx.text(img.to_string())
 }
 
 @[post]
