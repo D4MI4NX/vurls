@@ -8,7 +8,7 @@ type ShortenerDB = sqlite.DB
 fn ShortenerDB.connect(cfg AppConfig) !ShortenerDB {
 	db := sqlite.connect(cfg.db_path)!
 
-	if cfg.db_path == ":memory:" {
+	if cfg.db_path == ':memory:' {
 		db.journal_mode(sqlite.JournalMode.memory)!
 	}
 
