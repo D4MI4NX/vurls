@@ -1,0 +1,6 @@
+Privacy Policy for VURLS
+
+We collect your IP address along the URLs you shorten.
+IP addresses are logged to prevent abuse.
+The entries are retained for a minimum of @{expiration_time} seconds
+and until overwritten by new shortenings.

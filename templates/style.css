@@ -84,3 +84,8 @@ button:hover {
         background-color: #3f3f3f;
     }
 }
+
+#privacyPolicy {
+    bottom: 16px;
+    position: absolute;
+}

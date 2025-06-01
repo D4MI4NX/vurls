@@ -14,6 +14,7 @@ pub fn (mut app App) root(mut ctx Context, _path string) veb.Result {
 		"style.css" { return app.style(mut ctx) }
 		"script.js" { return app.script(mut ctx) }
 		"favicon.ico" { return app.favicon(mut ctx) }
+		"privacy-policy.txt" { return app.privacy_policy(mut ctx) }
 		else {}
 	}
 
@@ -69,6 +70,13 @@ pub fn (app &App) favicon(mut ctx Context) veb.Result {
 	ctx.set_content_type("image/vnd.microsoft.icon")
 	img := $embed_file("templates/favicon.ico")
 	return ctx.text(img.to_string())
+}
+
+pub fn (app &App) privacy_policy(mut ctx Context) veb.Result {
+	ctx.set_content_type("text/plain")
+	expiration_time := app.config.expiration_time
+	pp := $tmpl("templates/privacy-policy.txt")
+	return ctx.text(pp)
 }
 
 @[post]
