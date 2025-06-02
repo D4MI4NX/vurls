@@ -91,6 +91,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 		return ctx.request_error('Invalid URL!')
 	}
 
+	// check if shortening for a URL already present
 	rows := sql app.db {
 		select from ShortUrl where url == url
 	} or {
@@ -113,8 +114,9 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 			app.shortening_timeout_tracker.delete(ip)
 		}
 
+		// look for expired rows to reuse
 		expired_rows := sql app.db {
-			select from ShortUrl where expires < now
+			select from ShortUrl where expires < now order by expires
 		} or {
 			log.error('shorten: failed to query DB: ${err}')
 			[]ShortUrl{}
@@ -128,6 +130,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 
 		if 0 < expired_rows.len {
 			row := expired_rows.first()
+			// reuse row
 			sql app.db {
 				update ShortUrl set expires = s.expires, url = s.url, ip_address = s.ip_address,
 				created = s.created where id == row.id
@@ -137,6 +140,7 @@ pub fn (mut app App) shorten(mut ctx Context) veb.Result {
 			}
 			id = row.id
 		} else {
+			// create new row
 			id = sql app.db {
 				insert s into ShortUrl
 			} or {
