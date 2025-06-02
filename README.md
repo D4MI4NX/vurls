@@ -89,6 +89,10 @@ VURLS will look for following paths for configuration files, in this order:
 
 It will load the first one it finds and if none found, will use default values
 
+> [!NOTE]
+> 
+> You can run `./vurls(.exe) -c output.toml` to let VURLS create a config with default values for you at given path
+
 ### Notes:
 - V's `-prod` flag isnt properly working with VURLS
 - VURLS will reuse existing DB rows if expired when shortening a new URL, minimizing DB entries
